@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--JQuery libs-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  
+<script>
+$(document).ready(function(){
+      
+    //Check local storage whether user logged in or not
+	if(typeof(Storage) !== "undefined"){
+		if (localStorage.loggedUserName) {
+			var currentUser=localStorage.getItem("loggedUserName");
+			if (currentUser==""){
+				alert("Please login");
+				window.location.href="/login";
+			}else{
+				//If logged
+				console.log("Logged by "+currentUser);
+				$("#nav-signup").remove();
+				$("#nav-login").html("Logout");
+				$("#nav-login").attr("href","/index");
+				$("#welcome").html("User Name: "+currentUser);
+				for (i=1; i<=6; i++){
+					$("#drug"+i).hide();
+				}
+				var mydata="username="+currentUser;
+
+				$.ajax(
+				{
+					url: "/readfav",
+					type: 'POST',
+					data: mydata,
+					success: function(resultReturn)
+					{
+						//alert(resultReturn);
+						var stringObj = JSON.parse(resultReturn);
+						//alert(stringObj.length);
+						
+						for (j=1; j<=6; j++)
+						{
+							var drugname = $("#fav"+j).html();
+							
+							for(i = 0; i < stringObj.length; i++)
+							{
+								var num = i + 1;
+								//document.getElementsByClassName("tabnum")[i].innerHTML = num;
+								//document.getElementsByClassName("tabname")[i].innerHTML = stringObj[i].user + "<div id='"+stringObj[i]._id+"' class='removebutton'>Remove</a>";
+								console.log("drugname = "+drugname);
+								console.log("stringObj[i].favourite = "+stringObj[i].favourite);
+								console.log("stringObj[i]._id = "+stringObj[i]._id);
+								if (drugname == stringObj[i].favourite)
+								{
+									//alert("drug match");
+									$("#drug"+j).show();
+									$("#favid"+j).html(stringObj[i]._id);
+									//alert($("#favid"+j).html())
+									//document.getElementsByClassName("removelink")[i].innerHTML = stringObj[i]._id;
+								}
+							}
+						}
+					},error: function (xhr, textStatus, errorThrown) 
+					{
+						alert("search failed");
+						console.log(textStatus);
+						alert(xhr.responseText);
+					}
+				});				
+			}			
+		} else {
+			localStorage.setItem("loggedUserName","");
+		}
+	}
+	//When click button
+	$("#nav-login").click(function(){
+		alert("logout");
+		localStorage.setItem("loggedUserName","");
+	});
+
+
+
+	//When click button
+	$("button").click(function(){	
+
+		//alert(this.id);
+		var currentbutton=this.id;
+		
+		// Change Password
+		if(currentbutton=="changePwdBtn"){
+			$(function(){
+			  
+			  //Get values from form
+			  var pwd=$("#pass").val();
+			  var newpwd=$("#newpass").val();
+			  var renewpwd=$("#renewpass").val();
+			  var mydata="username="+currentUser+"&pwd="+pwd+"&newpwd="+newpwd;
+			  
+			  //Check values
+			  console.log("username="+currentUser);
+			  console.log("pwd = "+pwd);
+			  console.log("newpwd = "+newpwd);
+			  console.log("renewpwd = "+renewpwd);
+			  console.log("mydata = "+mydata);
+			  
+			  //Check user name and password are not empty
+			  if (pwd=="" || newpwd=="" || renewpwd==""){
+				alert("Please enter all fields");
+				return;
+			  }
+
+			  //Verify new password is different from existing password
+			  if (newpwd==pwd){
+				alert("New password should be different from existing password");
+				return;
+			  }
+			  
+			  //Verify password match re-type password
+			  if (newpwd!=renewpwd){
+				alert("Password not match, please re-enter");
+				return;
+			  }
+			  else{
+				//Everything OK, pass to server
+				console.log("Password match");
+				console.log("Contacting server...");
+				$.ajax({
+				  url: "/changepwd",
+				  type: "POST",
+				  data: mydata,
+				  //Sign up success
+				  success: function (result) {
+					alert("Change Success!");
+					console.log(mydata);
+					window.location.href="/profile"
+				  },
+				  //Sign up failed
+				  error: function(result){
+					alert("Change password failed.");
+					console.log(result);
+
+				  }
+				});
+				
+			   
+				return false;
+			  } //close else
+
+			});
+			return;
+		}; //close changePwdBtn.click	
+
+		if(currentbutton=="favBtn1"){
+		  var data=$("#favid1").html();
+		  var drugid="#drug1";
+		  console.log(data);
+		  var mydata="favid="+data;
+		  console.log("mydata= "+mydata);
+		} 
+		if(currentbutton=="favBtn2"){
+		  var data=$("#favid2").html();
+		  var drugid="#drug2";
+		  console.log(data);
+		  var mydata="favid="+data;
+		  console.log("mydata= "+mydata);
+		} 
+		if(currentbutton=="favBtn3"){
+		  var data=$("#favid3").html();
+		  var drugid="#drug3";
+		  console.log(data);
+		  var mydata="favid="+data;
+		  console.log("mydata= "+mydata);
+		} 
+		if(currentbutton=="favBtn4"){
+		  var data=$("#favid4").html();
+		  var drugid="#drug4";
+		  console.log(data);
+		  var mydata="favid="+data;
+		  console.log("mydata= "+mydata);
+		} 
+		if(currentbutton=="favBtn5"){
+		  var data=$("#favid5").html();
+		  var drugid="#drug5";
+		  console.log(data);
+		  var mydata="favid="+data;
+		  console.log("mydata= "+mydata);
+		} 
+		if(currentbutton=="favBtn6"){
+		  var data=$("#favid6").html();
+		  var drugid="#drug6";
+		  console.log(data);
+		  var mydata="favid="+data;
+		  console.log("mydata= "+mydata);
+		} 
+		$.ajax(
+			{	
+				url: "/removefav",
+				type: "POST",
+				data: mydata,
+				
+				success: function(result){
+					//alert("Item Removed");
+					//alert(data);
+					//$("#"+currentbutton).html("Remove from My Profile");
+					$(drugid).hide();
+					
+				},error: function (xhr, textStatus, errorThrown) {
+					//alert("remove failed");
+					console.log(textStatus);
+					//alert(xhr.responseText);
+				}
+			}
+		);
+
+	});
+		  
+})
+</script>
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Quit Smoking</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+
+    <!-- Custom styles for this template -->
+    <link href="css/agency.min.css" rel="stylesheet">
+
+  </head>
+
+  <body id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="/index">Quit Smoking</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          Menu
+          <i class="fa fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav text-uppercase ml-auto">
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/index">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#portfolio">Drugs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#contact">Change Password</a>
+            </li>
+            <li class="nav-item">
+              <a id="nav-signup" class="nav-link js-scroll-trigger" href="/signup">Sign Up</a>
+            </li>
+            <li class="nav-item">
+              <a id="nav-login" class="nav-link js-scroll-trigger" href="/login">Login</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="masthead">
+      <div class="container">
+        <div class="intro-text">
+          <div id="welcome" class="intro-lead-in">Welcome!</div>
+          <div class="intro-heading text-uppercase">My profile</div>
+          <a class="btn btn-primary btn-xl text-uppercase js-scroll-trigger" href="#portfolio">Go to My Drug List</a>
+        </div>
+      </div>
+    </header>
+
+
+    <!-- Drugs Grid -->
+    <section class="bg-light" id="portfolio">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 text-center">
+            <h2 class="section-heading text-uppercase">Your Drugs List for quitting smoking</h2>
+            <h3 class="section-subheading text-muted">These medications help alleviate withdrawal symptoms and hence increase the success rate effectively.</h3>
+          </div>
+        </div>
+        <div class="row">
+          <div id="drug1" class="col-md-4 col-sm-6 portfolio-item">
+            <a class="portfolio-link" data-toggle="modal" href="#portfolioModal1">
+              <div class="portfolio-hover">
+                <div class="portfolio-hover-content">
+                  <i class="fa fa-plus fa-3x"></i>
+                </div>
+              </div>
+              <img class="img-fluid" src="img/portfolio/01-thumbnail.jpg" alt="">
+            </a>
+            <div class="portfolio-caption">
+              <h4>Nicotine Gum</h4>
+              <p class="text-muted">Nicotine Replacement Therapy (NRT)</p>
+            </div>
+          </div>
+          <div id="drug2" class="col-md-4 col-sm-6 portfolio-item">
+            <a class="portfolio-link" data-toggle="modal" href="#portfolioModal2">
+              <div class="portfolio-hover">
+                <div class="portfolio-hover-content">
+                  <i class="fa fa-plus fa-3x"></i>
+                </div>
+              </div>
+              <img class="img-fluid" src="img/portfolio/02-thumbnail.jpg" alt="">
+            </a>
+            <div class="portfolio-caption">
+              <h4>Nicotine Patch</h4>
+              <p class="text-muted">Nicotine Replacement Therapy (NRT)</p>
+            </div>
+          </div>
+          <div id="drug3" class="col-md-4 col-sm-6 portfolio-item">
+            <a class="portfolio-link" data-toggle="modal" href="#portfolioModal3">
+              <div class="portfolio-hover">
+                <div class="portfolio-hover-content">
+                  <i class="fa fa-plus fa-3x"></i>
+                </div>
+              </div>
+              <img class="img-fluid" src="img/portfolio/03-thumbnail.jpg" alt="">
+            </a>
+            <div class="portfolio-caption">
+              <h4>Nicotine Inhaler</h4>
+              <p class="text-muted">Nicotine Replacement Therapy (NRT)</p>
+            </div>
+          </div>
+          <div id="drug4" class="col-md-4 col-sm-6 portfolio-item">
+            <a class="portfolio-link" data-toggle="modal" href="#portfolioModal4">
+              <div class="portfolio-hover">
+                <div class="portfolio-hover-content">
+                  <i class="fa fa-plus fa-3x"></i>
+                </div>
+              </div>
+              <img class="img-fluid" src="img/portfolio/04-thumbnail.jpg" alt="">
+            </a>
+            <div class="portfolio-caption">
+              <h4>Nicotine Lozenge</h4>
+              <p class="text-muted">Nicotine Replacement Therapy (NRT)</p>
+            </div>
+          </div>
+          <div id="drug5" class="col-md-4 col-sm-6 portfolio-item">
+            <a class="portfolio-link" data-toggle="modal" href="#portfolioModal5">
+              <div class="portfolio-hover">
+                <div class="portfolio-hover-content">
+                  <i class="fa fa-plus fa-3x"></i>
+                </div>
+              </div>
+              <img class="img-fluid" src="img/portfolio/05-thumbnail.jpg" alt="">
+            </a>
+            <div class="portfolio-caption">
+              <h4>Bupropion</h4>
+              <p class="text-muted">Non-nicotine Medication</p>
+            </div>
+          </div>
+          <div id="drug6" class="col-md-4 col-sm-6 portfolio-item">
+            <a class="portfolio-link" data-toggle="modal" href="#portfolioModal6">
+              <div class="portfolio-hover">
+                <div class="portfolio-hover-content">
+                  <i class="fa fa-plus fa-3x"></i>
+                </div>
+              </div>
+              <img class="img-fluid" src="img/portfolio/06-thumbnail.jpg" alt="">
+            </a>
+            <div class="portfolio-caption">
+              <h4>Varenicline</h4>
+              <p class="text-muted">Non-nicotine Medication</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- Change Password -->
+    <section id="contact">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 text-center">
+            <h2 class="section-heading text-uppercase">Change Password</h2>
+            <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <form id="contactForm" name="sentMessage" novalidate="novalidate">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <input class="form-control" id="pass" type="password" placeholder="Existing Password *" required="required" data-validation-required-message="Please enter your existing password.">
+                    <p class="help-block text-danger"></p>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" id="newpass" type="password" placeholder="New Password *" required="required" data-validation-required-message="Please enter your new password.">
+                    <p class="help-block text-danger"></p>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" id="renewpass" type="password" placeholder="Re-type New Password *" required="required" data-validation-required-message="Please re-type your new password.">
+                    <p class="help-block text-danger"></p>
+                  </div>
+
+                </div>
+
+                <div class="clearfix"></div>
+                <div class="col-lg-12 text-center">
+                  <div id="success"></div>
+                  <button id="changePwdBtn" class="btn btn-primary btn-xl text-uppercase" type="submit">Change Password</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <span class="copyright">Copyright &copy; Your Website 2018</span>
+          </div>
+          <div class="col-md-4">
+            <ul class="list-inline social-buttons">
+              <li class="list-inline-item">
+                <a href="#">
+                  <i class="fa fa-twitter"></i>
+                </a>
+              </li>
+              <li class="list-inline-item">
+                <a href="#">
+                  <i class="fa fa-facebook"></i>
+                </a>
+              </li>
+              <li class="list-inline-item">
+                <a href="#">
+                  <i class="fa fa-linkedin"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <ul class="list-inline quicklinks">
+              <li class="list-inline-item">
+                <a href="#">Privacy Policy</a>
+              </li>
+              <li class="list-inline-item">
+                <a href="#">Terms of Use</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Portfolio Modals -->
+
+    <!-- Drug 1 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="close-modal" data-dismiss="modal">
+            <div class="lr">
+              <div class="rl"></div>
+            </div>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 mx-auto">
+                <div class="modal-body">
+                  <!-- Project Details Go Here -->
+                  <h2 id="fav1" class="text-uppercase">Nicotine Gum</h2>
+                  <p class="item-intro text-muted">Nicotine Replacement Therapy (NRT)</p>
+                  <img class="img-fluid d-block mx-auto" src="img/portfolio/01-full.jpg" alt="">
+                  <p>Chewing nicotine gum is different from chewing ordinary gum. The nicotine gum should be chewed slowly until a strong taste released and then park it intermittently between the cheeks for absorption. When the taste gradually becomes lighter, repeat the process until the gum becomes tasteless. Incorrect chewing may not only affect the absorption of nicotine but also cause side effects such as sore mouth and throat, hiccups and stomachache.</p>
+                  <ul class="list-inline">
+                    <li id="favid1">Date: January 2017</li>
+                    <li>Client: Threads</li>
+                    <li>Category: Illustration</li>
+                  </ul>
+                  <button id="favBtn1" class="btn btn-primary" data-dismiss="modal" type="button">
+                    <i class="fa fa-times"></i>
+                    Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drug 2 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="close-modal" data-dismiss="modal">
+            <div class="lr">
+              <div class="rl"></div>
+            </div>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 mx-auto">
+                <div class="modal-body">
+                  <!-- Project Details Go Here -->
+                  <h2 id="fav2" class="text-uppercase">Nicotine Patch</h2>
+                  <p class="item-intro text-muted">Nicotine Replacement Therapy (NRT)</p>
+                  <img class="img-fluid d-block mx-auto" src="img/portfolio/02-full.jpg" alt="">
+                  <p>When using the patch, apply one patch per day to clean and dry skin on the chest, back, upper arms, hips, etc. Keep it at all times including swimming and showering. Change the location daily to avoid skin irritation.</p>
+                  <ul class="list-inline">
+                    <li id="favid2">Date: January 2017</li>
+                    <li>Client: Explore</li>
+                    <li>Category: Graphic Design</li>
+                  </ul>
+                  <button id="favBtn2" class="btn btn-primary" data-dismiss="modal" type="button">
+                    <i class="fa fa-times"></i>
+                    Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drug 3 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal3" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="close-modal" data-dismiss="modal">
+            <div class="lr">
+              <div class="rl"></div>
+            </div>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 mx-auto">
+                <div class="modal-body">
+                  <!-- Project Details Go Here -->
+                  <h2 id="fav3" class="text-uppercase">Nicotine Inhaler</h2>
+                  <p class="item-intro text-muted">Nicotine Replacement Therapy (NRT)</p>
+                  <img class="img-fluid d-block mx-auto" src="img/portfolio/03-full.jpg" alt="">
+                  <p>A nicotine inhaler consists of a plastic suction tube and a nicotine-containing cartridge. To use nicotine inhaler, insert the cartridge into the suction tube to break the seal. The inhaler delivers nicotine to oral mucosa.  There are two methods for using nicotine inhaler: rapid shallow sucking or slow and deep inhalation. The effects of both methods are more or less the same.  At the beginning, user may experience mouth and throat irritation. Adequate water intake can relieve the discomfort.  The side effects would subside as the body get used to it.</p>
+                  <ul class="list-inline">
+                    <li id="favid3">Date: January 2017</li>
+                    <li>Client: Finish</li>
+                    <li>Category: Identity</li>
+                  </ul>
+                  <button id="favBtn3" class="btn btn-primary" data-dismiss="modal" type="button">
+                    <i class="fa fa-times"></i>
+                    Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drug 4 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal4" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="close-modal" data-dismiss="modal">
+            <div class="lr">
+              <div class="rl"></div>
+            </div>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 mx-auto">
+                <div class="modal-body">
+                  <!-- Project Details Go Here -->
+                  <h2 id="fav4" class="text-uppercase">Nicotine Lozenge</h2>
+                  <p class="item-intro text-muted">Nicotine Replacement Therapy (NRT)</p>
+                  <img class="img-fluid d-block mx-auto" src="img/portfolio/04-full.jpg" alt="">
+                  <p>When taking the lozenge, it should be placed in the mouth and moved at intervals from one side of the mouth to the other, until it dissolves. The lozenge should not be chewed or swallowed whole.</p>
+                  <ul class="list-inline">
+                    <li  id="favid4">Date: January 2017</li>
+                    <li>Client: Lines</li>
+                    <li>Category: Branding</li>
+                  </ul>
+                  <button id="favBtn4" class="btn btn-primary" data-dismiss="modal" type="button">
+                    <i class="fa fa-times"></i>
+                    Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drug 5 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal5" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="close-modal" data-dismiss="modal">
+            <div class="lr">
+              <div class="rl"></div>
+            </div>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 mx-auto">
+                <div class="modal-body">
+                  <!-- Project Details Go Here -->
+                  <h2 id="fav5" class="text-uppercase">Bupropion</h2>
+                  <p class="item-intro text-muted">Non-nicotine Medication</p>
+                  <img class="img-fluid d-block mx-auto" src="img/portfolio/05-full.jpg" alt="">
+                  <p>Bupropion is a drug developed to treat depression but it has also been used to help people quit smoking. Bupropion contains no nicotine and its active ingredient, amfebutamone, helps in reducing the craving on nicotine and thus the withdrawal symptoms. Bupropion should be used under the supervision of doctor.</p>
+                  <ul class="list-inline">
+                    <li id="favid5">Date: January 2017</li>
+                    <li>Client: Southwest</li>
+                    <li>Category: Website Design</li>
+                  </ul>
+                  <button id="favBtn5" class="btn btn-primary" data-dismiss="modal" type="button">
+                    <i class="fa fa-times"></i>
+                    Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drug 6 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal6" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="close-modal" data-dismiss="modal">
+            <div class="lr">
+              <div class="rl"></div>
+            </div>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 mx-auto">
+                <div class="modal-body">
+                  <!-- Project Details Go Here -->
+                  <h2 id="fav6" class="text-uppercase">Varenicline</h2>
+                  <p class="item-intro text-muted">Non-nicotine Medication</p>
+                  <img class="img-fluid d-block mx-auto" src="img/portfolio/06-full.jpg" alt="">
+                  <p>Varenicline is drug for smoking cessation that contains no nicotine. It helps to relieve withdrawal symptoms and craving for cigarette while at the same time blocking the reinforcing effects of nicotine. Varenicline should be used under the supervision of a doctor.</p>
+                  <ul class="list-inline">
+                    <li id="favid6">Date: January 2017</li>
+                    <li>Client: Window</li>
+                    <li>Category: Photography</li>
+                  </ul>
+                  <button id="favBtn6" class="btn btn-primary" data-dismiss="modal" type="button">
+                    <i class="fa fa-times"></i>
+                    Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Contact form JavaScript -->
+    <script src="js/jqBootstrapValidation.js"></script>
+    <script src="js/contactme.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="js/agency.min.js"></script>
+
+  </body>
+
+</html>

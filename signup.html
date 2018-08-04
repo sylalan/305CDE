@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+    <!--JQuery libs-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  
+  <script>
+    $(document).ready(function(){
+      
+      //Check local storage whether user logged in or not
+      var currentUser=localStorage.getItem("loggedUserName");
+            
+      if (currentUser!=""){
+        alert("Logged by "+currentUser);
+		localStorage.setItem("loggedUserName","");
+		
+      }
+   
+      //AJAX
+    $("#submitBtn").click(function(){
+        $(function(){
+          
+          //Get values from form
+          var username=$("#usrname").val();
+          var pwd=$("#pass").val();
+          var repwd=$("#repass").val();
+          var mydata="username="+username+"&pwd="+pwd;
+          
+          //Check values
+          console.log("username = "+username);
+          console.log("pwd = "+pwd);
+          console.log("repwd = "+repwd);
+          console.log("mydata = "+mydata);
+          
+          //Check user name and password are not empty
+          if (username=="" && pwd==""){
+            alert("Please enter your User Name and Password");
+            return;
+          }
+
+          //Check user name is not empty
+          if (username==""){
+            alert("Please enter your User Name");
+            return;
+          }
+
+          //Check password is not empty
+          if (pwd==""){
+            alert("Please enter your Password");
+            return;
+          }
+
+          //Check re-type password is not empty
+          if (repwd==""){
+            alert("Please re-type your Password");
+            return;
+          }
+
+          //Verify password match re-type password
+          if (pwd!=repwd){
+            alert("Password not match, please re-enter");
+            return;
+          }
+          else{
+            //Everything OK, pass to server
+            console.log("Password match");
+			console.log("Contacting server...");
+            $.ajax({
+              url: "/signup",
+              type: "POST",
+              data: mydata,
+			  //Sign up success
+              success: function (result) {
+                alert("Sign Up Success! Please Login");
+                console.log(mydata);
+                console.log("hope can see here");
+				window.location.href="/login"
+              },
+			  //Sign up failed
+              error: function(result){
+                alert("User Name already exist, sign up failed.");
+				console.log(result);
+
+              }
+            });
+            
+           
+            return false;
+          } //close else
+          
+
+		});
+	}); //close $("#submitBtn").click
+      
+      
+      //Click to fadeout image
+      //$("#myImage").click(function(){
+      //  $("#myImage").fadeOut()
+      //})
+    })
+  </script>
+
+  
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Agency - Start Bootstrap Theme</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+
+    <!-- Custom styles for this template -->
+    <link href="css/agency.min.css" rel="stylesheet">
+
+  </head>
+
+  <body id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="/index">Start Bootstrap</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          Menu
+          <i class="fa fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav text-uppercase ml-auto">
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/index">Home</a>
+            </li>
+            <li class="nav-item">
+              <a id="nav-signup" class="nav-link js-scroll-trigger" href="#contact">Sign Up</a>
+            </li>
+            <li class="nav-item">
+              <a id="nav-login" class="nav-link js-scroll-trigger" href="/login">Login</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+	
+	
+	<!-- Sign Up -->
+	
+	<section id="contact">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 text-center">
+            <h2 class="section-heading text-uppercase">Sign Up</h2>
+            <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <div id="contactForm" name="sentMessage" novalidate="novalidate">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <input class="form-control" id="usrname" type="text" placeholder="Your Name *" required="required" data-validation-required-message="Please enter your user name.">
+                    <p class="help-block text-danger"></p>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" id="pass" type="password" placeholder="Your Password *" required="required" data-validation-required-message="Please enter your password.">
+                    <p class="help-block text-danger"></p>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" id="repass" type="password" placeholder="Re-type Your Password *" required="required" data-validation-required-message="Please re-type your password.">
+                    <p class="help-block text-danger"></p>
+                  </div>
+                </div>
+
+                <div class="clearfix"></div>
+                <div class="col-lg-12 text-center">
+                  <div id="success"></div>
+                  <button id="submitBtn" class="btn btn-primary btn-xl text-uppercase" type="submit">Sign Up</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+	
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <span class="copyright">Copyright &copy; Your Website 2018</span>
+          </div>
+          <div class="col-md-4">
+            <ul class="list-inline social-buttons">
+              <li class="list-inline-item">
+                <a href="#">
+                  <i class="fa fa-twitter"></i>
+                </a>
+              </li>
+              <li class="list-inline-item">
+                <a href="#">
+                  <i class="fa fa-facebook"></i>
+                </a>
+              </li>
+              <li class="list-inline-item">
+                <a href="#">
+                  <i class="fa fa-linkedin"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <ul class="list-inline quicklinks">
+              <li class="list-inline-item">
+                <a href="#">Privacy Policy</a>
+              </li>
+              <li class="list-inline-item">
+                <a href="#">Terms of Use</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Portfolio Modals -->
+
+    
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Contact form JavaScript -->
+    <script src="js/jqBootstrapValidation.js"></script>
+    <script src="js/contactme.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="js/agency.min.js"></script>
+	
+  </body>
+
+</html>
